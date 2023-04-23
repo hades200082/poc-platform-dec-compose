@@ -88,3 +88,29 @@ Use `docker compose up -d` to spin them up again as this will recreate the conta
 #### Closed them down with `docker compose stop`
 
 Use `docker compose start` instead.
+
+### Accessing the Services
+
+- Cosmos Explorer: https://localhost:8081/_explorer/index.html
+- RabbitMQ Manager: http://localhost:15672/ (u: `guest` | p: `guest`)
+- Azurite: Use [Azure Storage Explorer](https://azure.microsoft.com/en-gb/products/storage/storage-explorer/) to connect to the local storage emulator.
+
+### Running the solution
+
+1. Ensure that your docker containers are running as described above.
+2. Ensure that you have trusted the dotnet developer certificates by running the command `dotnet dev-certs https --trust`
+3. Open the [api](./api) solution in visual Studio or Jetbrains Rider.
+4. Run the "https" runtime configuration (it should be the only one available)
+
+This will open Swagger in your default browser. There are two POST endpoints available:
+
+#### /TestCosmos
+
+This endpoint will create a `TestEntity` in your cosmosdb instance. You can verify this with the Cosmos Explorer.
+
+#### /TestMassTransit
+
+This endpoint will do two things:
+
+1. **Publish a notification to RabbitMQ.** You can verify this by checking to see if an exchange exists named after the fully qualified type used for the message (in this case `Host.Models.TestMessage`). If you view the exchange immediately after running the endpoint you will see the spike in the graph showing the message being sent.
+2. **Send a message to a queue in RabbitMQ.** You can verify this by locating a queue with the name "test" in the queues section. Within this queue you can use the management console to get the messages and see their data.
